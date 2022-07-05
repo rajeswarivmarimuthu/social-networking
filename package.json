@@ -1,0 +1,19 @@
+{
+  "name": "social-networking",
+  "version": "1.0.0",
+  "description": "This application is to social networking app where users will be able to share their thoughts and reactions to it. ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com-rajeswarivmarimuthu:rajeswarivmarimuthu/social-networking.git"
+  },
+  "author": "Rajeswari Marimuthu",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.1",
+    "mongoose": "^6.4.2"
+  }
+}
