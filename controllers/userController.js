@@ -1,5 +1,5 @@
-//destructring the user and thought models into User and Thought from models
-const { User, Thought } = require('../models');
+//destructring the user models into User and Thought from models
+const { User } = require('../models');
 
 //function to get all the users from mongodb
 function getUsers(req, res) {
