@@ -1,5 +1,7 @@
+const BSON = require('bson');
+
 //destructring the thought model into Thought from models
-const { Thought } = require('../models');
+const { User, Thought } = require('../models');
 
 //function to get all the thoughts from mongodb
 function getThoughts(req, res) {
@@ -8,7 +10,7 @@ function getThoughts(req, res) {
       .catch((err) => res.status(500).json(err));
   };
 
-  //function to get all the thoughts from database
+  //function to get a thoughts from database
   function getSingleThought(req, res) {
     Thought.findOne({ _id: req.params.thoughtId })
       .select('-__v')
@@ -23,7 +25,20 @@ function getThoughts(req, res) {
   //function to create thought 
   function createThought(req, res) {
     Thought.create(req.body)
-      .then((dbThoughtData) => res.json(dbThoughtData))
+      .then((dbThoughtData) => {
+        console.log(typeof(dbThoughtData._id),dbThoughtData._id);
+        User.findOneAndUpdate(
+        {_id: req.body.userId},
+        { $push: { "thoughts": dbThoughtData._id}},     
+        {new: true },
+        (err, result) => {
+          if (result) {
+            console.log(`Updated: ${result}`);
+          } else {
+            console.log('Uh Oh, something went wrong');
+          }
+        })
+        res.json(dbThoughtData)})
       .catch((err) => res.status(500).json(err));
   };
 
