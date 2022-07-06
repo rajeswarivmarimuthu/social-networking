@@ -59,28 +59,69 @@ function getUsers(req, res) {
         else {
           for (const key of Object.keys(req.body)) {
             if (key in user) {
-              user[key] = req.body[key]; 
+              if (key == 'username') {
+                // update the user with the modified user object 
+                User.findOneAndUpdate(
+                  {_id: req.params.userId}, 
+                  {$set:{"username": req.body.username}},
+                  function (err, result){
+                    if (err){
+                      console.log('Uh Oh, something went wrong in update', err);
+                       set_username = false;
+                    }
+                    else{
+                        console.log("updated user: ", result);
+                        set_username = true;
+                    }
+                })
+              } else if (key == 'email') {
+                    User.findOneAndUpdate(
+                      {_id: req.params.userId}, 
+                      {$set:{"email": req.body.email}},
+                      function (err, result){
+                        if (err){
+                          console.log('Uh Oh, something went wrong in update', err);
+                          set_email = false;
+                        }
+                        else{
+                            console.log("updated user: ", result);
+                            set_email = true;
+                        }
+                    });
+              }
+              else {
+                res.json('You can only update username and email;')
+              }
             };
-          };
-          // update the user with the modified user object 
-          User.findOneAndReplace(
-            {_id: req.params.userId}, 
-            user, 
-            function (err, user){
-              if (err){
-                console.log('Uh Oh, something went wrong in update');
-                res.json(err);
-              }
-              else{
-                  console.log("updated user: ", user);
-                  res.json(user);
-              }
-          })
-         }
+          }; 
         }
-      )
+        if ( set_username || set_email) {
+          res.json(user);
+        }
+      })
       .catch((err) => res.status(500).json(err));
     }
 
+    //Function to delete user and the thoughts they posted
 
-  module.exports = {getUsers, getSingleUser, createUser, updateUserFriend, updateUser}
+    function deleteUser (req, res) {
+      if (req.params.userId) {
+        User.findByIdAndDelete(req.params.userId)
+        .then((user) => {
+          Thought.deleteMany({username: user.username})
+          .then ((thoughts) => {
+            console.log ('Deleted all related thoughts', thoughts);
+          })
+          res.json(user);
+        })
+        .catch((err) => res.status(500).json(err));
+      }
+    }
+
+    //Function to delete friends from friends list of a user
+
+  // function deleteFriend (req, res) {
+
+  // }
+
+  module.exports = {getUsers, getSingleUser, createUser, updateUserFriend, updateUser, deleteUser}
