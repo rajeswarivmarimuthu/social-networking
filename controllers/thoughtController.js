@@ -43,4 +43,39 @@ function getThoughts(req, res) {
   };
 
 
-  module.exports = {getThoughts, getSingleThought, createThought}
+  //function to update a thought that is already posted
+  function updateThought(req, res) {
+    Thought.findOne({ _id: req.params.thoughtId })
+      .then((thought) => {
+        if (!thought) {
+          res.status(404).json({ message: 'No thought with that ID' })
+        }
+        else {
+          Thought.findOneAndUpdate(
+            {_id: req.params.thoughtId},
+            {$set:{"thoughtText": req.body.thoughtText}}, 
+            {new:true},
+            function (err, result){
+              if (err){
+                console.log('Uh Oh, something went wrong in update', err);
+                res.json(err);
+              }
+              else{
+                  console.log("updated thought: ", result);
+                  res.json(result);
+              }
+            }
+          )
+        }
+      })
+      .catch((err) => res.status(500).json(err));
+  }
+
+  //Delete a thought by thoughtId 
+  function deleteThought(req, res) {
+    Thought.findByIdAndDelete(req.params.thoughtId)
+    .then((dbThoughtData) => res.json(dbThoughtData))
+    .catch((err) => res.json(err))
+  }
+
+  module.exports = {getThoughts, getSingleThought, createThought,updateThought,deleteThought}

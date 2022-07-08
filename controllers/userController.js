@@ -1,8 +1,8 @@
 //destructring the user models into User and Thought from models
 const { User, Thought} = require('../models');
 
-//function to get all the users from mongodb
-function getUsers(req, res) {
+  //function to get all the users from mongodb
+  function getUsers(req, res) {
     User.find()
       .then((users) => res.json(users))
       .catch((err) => res.status(500).json(err));
