@@ -26,14 +26,13 @@ function getThoughts(req, res) {
   function createThought(req, res) {
     Thought.create(req.body)
       .then((dbThoughtData) => {
-        console.log(typeof(dbThoughtData._id),dbThoughtData._id);
         User.findOneAndUpdate(
         {_id: req.body.userId},
         { $push: { "thoughts": dbThoughtData._id}},     
         {new: true },
         (err, result) => {
           if (result) {
-            console.log(`Updated: ${result}`);
+            console.log(`Thought is updated in: ${req.body.userId}`);
           } else {
             console.log('Uh Oh, something went wrong');
           }
@@ -48,7 +47,7 @@ function getThoughts(req, res) {
     Thought.findOne({ _id: req.params.thoughtId })
       .then((thought) => {
         if (!thought) {
-          res.status(404).json({ message: 'No thought with that ID' })
+          res.status.json({ message: 'No thought with that ID' })
         }
         else {
           Thought.findOneAndUpdate(
@@ -61,7 +60,7 @@ function getThoughts(req, res) {
                 res.json(err);
               }
               else{
-                  console.log("updated thought: ", result);
+                  console.log("updated thought: ", req.params.thoughtId);
                   res.json(result);
               }
             }
@@ -78,4 +77,39 @@ function getThoughts(req, res) {
     .catch((err) => res.json(err))
   }
 
-  module.exports = {getThoughts, getSingleThought, createThought,updateThought,deleteThought}
+  // add reaction to a thought
+  function addReaction(req,res){
+      Thought.findOneAndUpdate(
+        {_id: req.params.thoughtId},
+        {$push: { "reactions": req.body}},     
+        {new: true }, 
+        (err, result) => {
+          if (result) {
+            console.log(`added reaction to: ${req.params.thoughtId}`);
+            res.json(result);
+          } else {
+            console.log('Uh Oh, something went wrong');
+            res.json(err);
+          }
+    });
+  };
+
+  // Function to delete a reaction 
+  function deleteReaction (req,res) {
+    Thought.findOneAndUpdate(
+      {_id: req.params.thoughtId},
+      {$pull: { "reactions": {reactionId : req.params.reactionId}}},     
+      {new: true }, 
+      (err, result) => {
+        if (result) {
+          console.log(`Reaction removed from thought: ${req.params.thoughtId}`);
+          res.json(result);
+        } else {
+          console.log('Uh Oh, something went wrong');
+          res.json(err);
+        }
+      }
+   );
+  };
+
+  module.exports = {getThoughts, getSingleThought, createThought,updateThought,deleteThought, addReaction, deleteReaction}

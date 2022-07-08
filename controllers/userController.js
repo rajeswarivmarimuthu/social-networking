@@ -48,6 +48,8 @@ const { User, Thought} = require('../models');
 
     //Function to update user 
     function updateUser(req, res) {
+      // updated_flag
+      let updated_flag = false;
       // Finding the user by user id
       User.findById(req.params.userId)
       .then((user) => {
@@ -64,39 +66,40 @@ const { User, Thought} = require('../models');
                 User.findOneAndUpdate(
                   {_id: req.params.userId}, 
                   {$set:{"username": req.body.username}},
+                  {new: true},
                   function (err, result){
                     if (err){
                       console.log('Uh Oh, something went wrong in update', err);
-                       set_username = false;
+                      res.status(404).json(err);
                     }
                     else{
-                        console.log("updated user: ", result);
-                        set_username = true;
+                        console.log("Sucessfully updated for ", req.params.userId);
+                        updated_flag = true;
+                        res.status(200).json(result);
                     }
                 })
               } else if (key == 'email') {
                     User.findOneAndUpdate(
                       {_id: req.params.userId}, 
                       {$set:{"email": req.body.email}},
-                      function (err, result){
+                      {new: true},
+                      function (err, result) {
                         if (err){
                           console.log('Uh Oh, something went wrong in update', err);
-                          set_email = false;
+                          res.status(404).json(err);
                         }
                         else{
-                            console.log("updated user: ", result);
-                            set_email = true;
+                            console.log("updated for user: ", req.params.userId);
+                            updated_flag = true;
+                            res.status(200).json(result);
                         }
                     });
               }
               else {
-                res.json('You can only update username and email;')
+                res.status(404).json('You can only update username and email;')
               }
             };
           }; 
-        }
-        if ( set_username || set_email) {
-          res.json(user);
         }
       })
       .catch((err) => res.status(500).json(err));
@@ -127,7 +130,7 @@ const { User, Thought} = require('../models');
       {new: true }, 
       (err, result) => {
         if (result) {
-          console.log(`Updated: ${result}`);
+          console.log(`successfully updated for: req.params.userId`);
           res.json(result);
         } else {
           console.log('Uh Oh, something went wrong');
