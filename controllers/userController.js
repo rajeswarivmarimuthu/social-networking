@@ -120,8 +120,21 @@ function getUsers(req, res) {
 
     //Function to delete friends from friends list of a user
 
-  // function deleteFriend (req, res) {
+  function deleteFriend (req, res) {
+    User.findOneAndUpdate(
+      {_id: req.params.userId},
+      {$pull: { "friends": req.params.friendId}},     
+      {new: true }, 
+      (err, result) => {
+        if (result) {
+          console.log(`Updated: ${result}`);
+          res.json(result);
+        } else {
+          console.log('Uh Oh, something went wrong');
+          res.json(err);
+        }
+      }
+   );
+  }
 
-  // }
-
-  module.exports = {getUsers, getSingleUser, createUser, updateUserFriend, updateUser, deleteUser}
+  module.exports = {getUsers, getSingleUser, createUser, updateUserFriend, updateUser, deleteUser, deleteFriend}
